@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLACKOUT // TERMINAL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="ambient-grid"></div>
+    <div class="crt-overlay"></div>
+
+    <!-- AMBIENT DATA STREAM -->
+    <div class="data-stream-ticker">
+        <span id="hexStream">INITIALIZING SUBROUTINES...</span>
+    </div>
+
+    <!-- SCREENSHOT BLOCKER -->
+    <div id="screenshot-blocker" class="overlay hidden" style="z-index: 100000; background: #000; display: flex; align-items: center; justify-content: center;">
+        <h1 class="logo text-crimson blink-fast title-mono" style="font-size: 3rem; text-align: center; border: 2px solid var(--tech-crimson); padding: 2rem; background: rgba(255,0,0,0.1);">
+            SECURITY ALERT<br><span style="font-size:1.5rem; letter-spacing: 2px;">SCREENSHOT PROTOCOL BLOCKED</span>
+        </h1>
+    </div>
+
+    <!-- POPOVER OVERLAY -->
+    <div id="user-popover-overlay" class="overlay hidden">
+        <div class="glass-popover">
+            <div class="popover-header">TARGET NODE: <span id="popover-target-alias" class="text-white">...</span></div>
+            <button id="initiate-link-btn" class="btn-cyan" style="width:100%;">[ INITIATE TEXT LINK ]</button>
+            <button id="initiate-voice-btn" class="btn-ghost text-cyan" style="width:100%; margin-top:0.5rem; border: 1px solid var(--tech-cyan);">[ ESTABLISH VOICE FREQ ]</button>
+            <br>
+            <button id="close-popover-btn" class="btn-text" style="margin-top:1.5rem;">[ CANCEL ]</button>
+        </div>
+    </div>
+
+    <!-- INCOMING CALL MODAL (Simulated) -->
+    <div id="incoming-call-modal" class="overlay hidden" style="z-index: 10001; background: rgba(5,5,5,0.95);">
+        <div class="glass-popover" style="text-align: center; padding: 3rem; border: 1px solid var(--tech-cyan); border-radius: 8px; box-shadow: 0 0 40px rgba(0, 243, 255, 0.1);">
+            <div style="width: 80px; height: 80px; border-radius: 50%; border: 4px solid var(--tech-cyan); border-left-color: transparent; display: inline-block; margin-bottom: 2rem; animation: blinker 1s infinite var(--tech-cyan);"></div>
+            <div class="sys-msg blink-fast text-cyan" style="font-size: 1.2rem; margin-bottom: 2rem;">&gt; INCOMING ENCRYPTED FREQUENCY...<br><br><span id="incoming-caller-id" class="text-white title-mono" style="font-size: 1.8rem; font-weight: bold;">UNKNOWN_ALIAS</span></div>
+            <div class="action-row" style="justify-content: center; gap: 2rem; margin-top:2rem;">
+                <button id="btn-accept-call" class="btn-cyan" style="padding: 1rem 2rem; font-size: 1.2rem; font-weight: bold;">[ ACCEPT ]</button>
+                <button id="btn-reject-call" class="btn-danger hover-glow-crimson" style="padding: 1rem 2rem; font-size: 1.2rem;">[ REJECT ]</button>
+            </div>
+        </div>
+    </div>
+    <!-- STATE 1: INITIALIZATION -->
+    <main id="view-login" class="view">
+        <div class="terminal-box">
+            <h1 class="logo glow-text title-rajdhani">BLACKOUT_</h1>
+            <p class="sys-msg">> SYSTEM: SECURE CONNECTION ACTIVE.</p>
+            <div class="input-container">
+                <span class="prompt text-muted">&gt; ENTER ALIAS OR PRESS [GENERATE] TO PROCEED...</span>
+                <div class="input-line" style="margin-top: 1rem;">
+                    <span class="prompt-arrow text-cyan">&gt;</span>
+                    <input type="text" id="login-alias-input" placeholder="ALIAS..." autocomplete="off" spellcheck="false" class="tech-input flex-1">
+                    <span class="terminal-cursor text-cyan">█</span>
+                </div>
+            </div>
+            <div class="action-row">
+                <button id="generate-alias-btn" class="btn-ghost">[ GENERATE ]</button>
+                <button id="login-enter-btn" class="btn-cyan">[ INITIALIZE ]</button>
+            </div>
+            <div style="text-align:center; margin-top:2rem;">
+                <button class="btn-text panic-btn text-muted">[ PANIC / SECURE LOGOUT (ESC x3) ]</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- STATE 2: LOADING TRANSITION -->
+    <main id="view-loading" class="view hidden">
+        <div class="glitch-loader">
+            <div class="loader-text text-muted blink-fast">>> CONNECTING TO SUBSPACE...</div>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+        </div>
+    </main>
+
+    <!-- STATE 3: SECTOR DIRECTORY -->
+    <main id="view-sectors" class="view hidden">
+        <header class="app-header">
+            <div class="header-led"></div>
+            <button class="btn-text panic-btn text-muted" style="position:absolute; top: 1.5rem; left: 50%; transform:translateX(-50%); font-size:0.8rem;">[ PANIC: ESCx3 ]</button>
+            <h2 class="text-white title-rajdhani">SECTOR DIRECTORY</h2>
+            <div class="header-right text-muted title-mono">ID: <span id="current-alias-display" class="text-white"></span></div>
+        </header>
+        <div class="sectors-layout" style="display: flex; gap: 2rem; max-width: 1400px; margin: 0 auto; padding: 2rem 5%;">
+            <div class="sectors-main" style="flex: 3;">
+                <div class="sectors-grid-container" style="padding:0; margin:0;">
+
+            <!-- CUSTOM SERVER CREATION -->
+            <div class="custom-server-box glass" style="padding: 1.5rem; margin-bottom: 2.5rem; display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center; border: 1px dashed var(--tech-cyan); border-radius: 4px; background: rgba(0, 243, 255, 0.02);">
+                <div style="flex: 1; min-width: 250px;">
+                    <div class="text-cyan title-mono" style="margin-bottom: 0.5rem;">[ PRIVATE SERVER PROTOCOL ]</div>
+                    <div class="sys-msg" style="font-size: 0.85rem;">&gt; HOST A SECURE NODE OR INTEGRATE VIA UNIQUE HEX ID.</div>
+                </div>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center;">
+                    <button id="btn-create-server" class="btn-cyan" style="padding: 0.8rem 1.5rem;">[ HOST PRIVATE NODE ]</button>
+                    <div class="input-line" style="width: 250px; border-bottom: 1px solid var(--tech-cyan); padding-bottom: 5px;">
+                        <span class="prompt-arrow text-cyan">&gt;</span>
+                        <input type="text" id="join-server-input" placeholder="ENTER 0xID..." class="tech-input flex-1 text-cyan" autocomplete="off" spellcheck="false" style="text-transform: uppercase;">
+                        <button id="btn-join-server" class="btn-text text-white hover-glow-cyan">[ JOIN ]</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sys-msg">> GLOBAL SECTORS ACTIVE.</div>
+            <div id="sectors-grid" class="sectors-grid">
+                <!-- Injected via JS -->
+            </div>
+                </div>
+            </div>
+
+            <!-- GLOBAL TELEMETRY SIDEBAR -->
+            <aside class="global-telemetry glass border-cyan" style="flex: 1; padding: 1.5rem; height: fit-content; border: 1px solid var(--glass-border); border-radius: 4px; border-top: 2px solid var(--tech-cyan);">
+                <h3 class="title-mono text-cyan" style="border-bottom: 1px solid var(--tech-cyan-dim); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">GLOBAL TELEMETRY</h3>
+                
+                <div class="telemetry-section" style="margin-bottom: 2.5rem;">
+                    <div class="sys-msg" style="margin-bottom: 1rem; color: #fff;">&gt; SURGING FREQUENCIES</div>
+                    <ul id="trending-tags-list" style="list-style: none; padding: 0; margin: 0; display:flex; flex-direction:column; gap:0.8rem;">
+                        <!-- Injected via JS -->
+                    </ul>
+                </div>
+                
+                <div class="telemetry-section">
+                    <div class="sys-msg" style="margin-bottom: 1rem; color: #fff;">&gt; HIGH-TRAFFIC NODES</div>
+                    <ul id="top-sectors-list" style="list-style: none; padding: 0; margin: 0; display:flex; flex-direction:column; gap:0.8rem;">
+                        <!-- Injected via JS -->
+                    </ul>
+                </div>
+            </aside>
+
+        </div>
+    </main>
+
+    <!-- STATE 4: GROUP CHAT HUB -->
+    <main id="view-group-chat" class="view hidden">
+        <header class="app-header">
+            <button id="btn-back-sectors" class="btn-text">< [ BACK TO SECTORS ]</button>
+            <h2 id="current-sector-title" class="text-cyan title-rajdhani text-center flex-1">SECTOR</h2>
+            <div class="header-led active"></div>
+            <button class="btn-text panic-btn text-muted" style="position:absolute; top: 1.5rem; right: 4rem; font-size:0.8rem;">[ PANIC ]</button>
+        </header>
+        <section class="chat-container" style="position:relative;">
+            <!-- FILTER BANNER -->
+            <div id="filter-banner" class="hidden" style="background: rgba(0,243,255,0.05); padding: 0.8rem; text-align: center; border-bottom: 1px dashed var(--tech-cyan);">
+                <span class="title-mono text-cyan">&gt; FILTERING DATA STREAM BY:</span> <span id="filter-tag-display" class="text-white font-bold" style="margin-right: 2rem;"></span> 
+                <button id="btn-clear-filter" class="btn-ghost hover-glow-crimson text-crimson" style="padding: 0.2rem 1rem;">[ CLEAR FILTER ]</button>
+            </div>
+
+            <!-- AUTOCOMPLETE DROPDOWN -->
+            <div id="hashtag-autocomplete" class="glass hidden" style="position: absolute; bottom: 85px; left: 1rem; width: 250px; border: 1px solid var(--tech-cyan); z-index: 100; max-height: 200px; overflow-y: auto;">
+                <ul id="autocomplete-list" style="list-style: none; padding: 0; margin: 0;">
+                    <!-- injected JS -->
+                </ul>
+            </div>
+            <div id="group-feed" class="chat-feed"></div>
+            <div class="chat-input-area glass">
+                <div class="input-line">
+                    <span class="prompt-arrow text-muted">&gt;</span>
+                    <input type="text" id="group-chat-input" placeholder="BROADCAST MESSAGE..." class="tech-input flex-1" autocomplete="off" spellcheck="false">
+                    <span class="terminal-cursor text-cyan">█</span>
+                    <button id="group-attach-btn" class="btn-icon text-muted" title="Upload Payload">[ ATTACH ]</button>
+                    <button id="group-send-btn" class="btn-icon text-muted">[ SEND ]</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- STATE 5: PRIVATE CHAT -->
+    <main id="view-private-chat" class="view hidden">
+        <header class="app-header border-crimson">
+            <!-- COMPATIBILITY SCORE TRACKER -->
+            <div style="display:flex; flex-direction:column; align-items:flex-start; margin-right:auto;">
+               <div class="text-cyan title-mono" style="font-size:0.8rem; letter-spacing:1px;">LINK INTEGRITY: <span id="sync-score-display">0</span>%</div>
+               <div class="progress-bar" style="height:3px; width: 140px; margin-top: 5px; background: rgba(0,243,255,0.1);"><div id="sync-fill" style="height: 100%; width:0%; background:var(--tech-cyan); transition: width 0.3s ease;"></div></div>
+            </div>
+
+            <button id="btn-freq-link" class="btn-ghost text-cyan border-cyan perk-locked" style="margin-right:1rem; border: 1px solid var(--tech-cyan);">[ INITIATE VOICE LINK ]</button>
+            <button id="btn-sever-link" class="btn-danger hover-glow-crimson">[ SEVER LINK ]</button>
+            <h2 id="private-chat-title" class="text-crimson title-rajdhani flex-1 text-center" style="margin-left: -50px;">TARGET: UNKNOWN</h2>
+                VOLATILE LINK: CLOSING IN <span id="countdown-clock">24:00:00</span>
+            </div>
+        </header>
+        <section class="chat-container alert-container" style="position: relative;">
+            
+            <!-- ACTIVE VOICE HUB -->
+            <div id="active-voice-hub" class="hidden" style="width: 100%; border-bottom: 1px solid var(--tech-cyan-dim); padding: 1rem; background: rgba(0, 243, 255, 0.05); display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <div style="display: flex; width: 100%; justify-content: space-between; align-items: center;">
+                    <span class="text-cyan title-mono blink-fast">🔴 LIVE OTR STREAM</span>
+                    <span id="embedded-voice-timer" class="title-mono text-cyan" style="font-size: 1.2rem;">00:00</span>
+                </div>
+                <canvas id="embedded-visualizer" width="600" height="80" style="width: 100%; border: 1px solid rgba(0, 243, 255, 0.2); border-radius: 4px; background: rgba(0,0,0,0.8);"></canvas>
+                <div class="action-row" style="width: 100%; justify-content: center; gap: 2rem;">
+                    <button id="hub-mute-btn" class="btn-ghost text-white" style="border: 1px solid var(--glass-border); border-radius: 50px; padding: 0.5rem 1.5rem;">[ MUTE MIC ]</button>
+                    <button id="hub-end-btn" class="btn-danger hover-glow-crimson text-crimson" style="border: 1px solid var(--tech-crimson); border-radius: 50px; padding: 0.5rem 1.5rem;">[ SEVER VOICE LINK ]</button>
+                </div>
+            </div>
+
+            <div id="private-feed" class="chat-feed"></div>
+            <div class="chat-input-area alert-border" style="display: flex; flex-direction: column;">
+                <!-- ADVANCED PERKS DOCK -->
+                <div class="secure-perks-dock" style="display:flex; gap:15px; margin-bottom:10px; font-family:monospace; font-size:0.8rem; border-bottom: 1px dashed rgba(255,0,60,0.3); padding-bottom: 10px;">
+                    <span class="text-crimson" style="opacity: 0.8;">> SYNC_PERKS:</span>
+                    <button id="perk-video" class="btn-text text-cyan perk-locked" style="padding:0;">🔒 VIDEO_LINK</button>
+                    <button id="perk-media" class="btn-text text-cyan perk-locked" style="padding:0;">🔒 SYNC_WATCH</button>
+                </div>
+                
+                <div class="input-line">
+                    <span class="prompt-arrow text-crimson">&gt;</span>
+                    <input type="text" id="private-chat-input" placeholder="TRANSMIT SECURELY..." class="tech-input flex-1 text-crimson" autocomplete="off" spellcheck="false">
+                    <span class="terminal-cursor text-crimson">█</span>
+                    <button id="private-attach-btn" class="btn-icon text-crimson perk-locked" title="Upload Payload" style="margin-right: 5px;">[ ATTACH ]</button>
+                    <button id="private-send-btn" class="btn-icon text-crimson">[ SEND ]</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- STATE 6: BANNED -->
+    <main id="view-banned" class="view hidden">
+        <div class="terminal-box alert-border" style="text-align: center; max-width: 500px; padding: 4rem;">
+            <h1 class="logo glow-text title-rajdhani text-crimson">ACCESS_DENIED</h1>
+            <p class="sys-msg text-crimson" style="font-size:1rem;">> FATAL: MACHINE ID BLACKLISTED.</p>
+            <div class="glass-danger" style="margin-top: 3rem; line-height: 1.8; font-size: 0.95rem; text-align: left;">
+                YOUR PROXY HAS ACCUMULATED 3 STRIKES FOR PROTOCOL VIOLATIONS.<br><br>
+                ALL ACTIVE CONNECTIONS PURGED.<br>
+                MAC ADDRESS LOGGED.<br>
+                NETWORK DISCONNECTED.
+            </div>
+        </div>
+    </main>
+
+    <!-- STATE 7: STEALTH MODE -->
+    <main id="view-stealth" class="view hidden" style="background-color: #000 !important; color: #ccc !important; font-family: Consolas, Courier, monospace !important; z-index: 9999; padding:10px; overflow-y:auto; cursor: text; text-align: left;">
+        <div id="cmd-log" style="font-size: 14px; line-height: 1.4;">
+            Microsoft Windows [Version 10.0.19045.3324]<br>
+            (c) Microsoft Corporation. All rights reserved.<br><br>
+        </div>
+        <div style="display:flex; font-size: 14px; align-items: baseline;">
+            <span>C:\Users\Public&gt;&nbsp;</span>
+            <input type="text" id="stealth-input" autocomplete="off" spellcheck="false" style="background:transparent; border:none; color:inherit; font-family:inherit; outline:none; flex:1; font-size: 14px;">
+        </div>
+    </main>
+
+    <!-- INCOMING CALL MODAL -->
+    <div id="incoming-call-modal" class="overlay hidden glass-danger" style="z-index: 200; justify-content: center; align-items: center; flex-direction: column; background: rgba(0,0,0,0.95); position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;">
+        <div class="terminal-box border-crimson" style="padding: 3rem; text-align: center; border: 2px dashed var(--tech-crimson); max-width: 400px; box-shadow: 0 0 50px rgba(255,0,60,0.2);">
+            <div class="text-crimson blink-fast title-mono" style="font-size: 1.5rem; margin-bottom: 1rem;">🚨 INCOMING FREQ TRANSMISSION</div>
+            <div style="font-size: 1rem; margin-bottom: 2rem;">TARGET ALIAS: <br><span id="incoming-caller-id" class="text-white title-rajdhani" style="font-size: 2rem;">UNKNOWN</span></div>
+            
+            <div style="display: flex; justify-content: center; gap: 2rem;">
+                <button id="btn-accept-call" class="btn-cyan hover-glow-cyan" style="padding: 1rem 2rem; border: 1px solid var(--tech-cyan); border-radius: 4px; font-size: 1.2rem; cursor: pointer;">[ ACCEPT ]</button>
+                <button id="btn-reject-call" class="btn-danger hover-glow-crimson" style="padding: 1rem 2rem; border: 1px solid var(--tech-crimson); border-radius: 4px; font-size: 1.2rem; cursor: pointer;">[ REJECT ]</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HIDDEN UPLOAD INPUT -->
+    <input type="file" id="global-upload-input" style="display: none;">
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
