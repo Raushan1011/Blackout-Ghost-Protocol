@@ -69,3 +69,5 @@ Advanced interaction features such as:
 Video conferencing
 Synchronized media viewing
 Concurrent audio streaming
+
+domain - https://blackout-gp.netlify.app/
