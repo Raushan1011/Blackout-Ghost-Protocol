@@ -4,16 +4,6 @@ Overview
 
 Ghost Protocol is a privacy-first social platform designed to reduce the psychological pressure associated with traditional social media. It enables users, particularly students, to interact anonymously through temporary conversations, promoting authentic and low-stakes communication.
 
-Problem Statement
-
-Traditional social media platforms often create pressure related to identity, reputation, and social validation, which leads to:
-
-Reduced self-expression
-Increased anxiety and social comparison
-Hesitation in open communication
-
-Users often feel judged due to persistent digital identity and long-term visibility of their interactions.
-
 Scenario
 
 In a typical student environment:
